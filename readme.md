@@ -1,8 +1,13 @@
+# IMPORTANT: make sure to copy both `cc1101.yaml` and `cc1101.h`
+
 ![image](https://esphome.io/_images/made-for-esphome-black-on-white.svg)
 # CC1101 support for ESPHome
-
-IMPORTANT: make sure to copy both `cc1101.yaml` and `cc1101.h`
 ![image](./cc1101-variants.png)
+
+
+![image](./3-receivers-in-node.jpeg)
+
+
 
 # Basic
 see cc1101.yaml
