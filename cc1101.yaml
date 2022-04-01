@@ -1,0 +1,62 @@
+# https://github.com/dbuezas/esphome-cc1101
+esphome:
+  name: cc1101
+  platform: ESP8266
+  board: d1_mini
+  includes:
+    - cc1101.h
+  libraries:
+    - SPI
+    - "SmartRC-CC1101-Driver-Lib"
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_pass
+  fast_connect: true
+  power_save_mode: HIGH
+
+logger:
+api:
+ota:
+
+sensor:
+  - platform: custom
+    lambda: |-
+      auto my_sensor = new CC1101(
+        D5, // SCK
+        D6, // MISO
+        D7, // MOSI
+        D3, // CSN
+        D1, // GDO0
+        200, // bandwidth_in_khz
+        433.92 // freq_in_mhz
+      );
+      App.register_component(my_sensor);
+      return {my_sensor};
+    sensors:
+      id: transciver
+      internal: true
+remote_transmitter:
+  - pin: D1 # This is GDO0
+    carrier_duty_percent: 100%
+
+remote_receiver:
+  - pin: D1 # This is GDO0
+      # on the esp8266 use any of D1,D2,D5,D6,D7,Rx
+      # Don't use D3,D4,D8,TX, boot often fails.
+      # Can't be D0 or GPIO17 b/c no interrupts
+    dump:
+      - raw
+binary_sensor:
+  - platform: remote_receiver
+    name: Garage
+    raw:
+      code: [415,-300,370,-300,375,-300,378,-300,378,-300,379,-300,405]
+button:
+  - platform: template
+    name: Garage
+    on_press:
+      - lambda: get_cc1101(transciver).beginTransmission();
+      - remote_transmitter.transmit_raw:
+          code: [415,-300,370,-300,375,-300,378,-300,378,-300,379,-300,405]
+      - lambda: get_cc1101(transciver).endTransmission();
