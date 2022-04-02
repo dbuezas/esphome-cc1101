@@ -58,9 +58,11 @@ class CC1101 : public PollingComponent, public Sensor {
     ELECHOUSE_cc1101.SetRx();  // yes, twice
   }
   void setBW(float bandwidth) {
+    ELECHOUSE_cc1101.setModul(_moduleNumber);
     ELECHOUSE_cc1101.setRxBW(bandwidth);
   }
   void setFreq(float freq) {
+    ELECHOUSE_cc1101.setModul(_moduleNumber);
     ELECHOUSE_cc1101.setMHZ(freq);
   }
   bool rssi_on;
