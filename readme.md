@@ -17,3 +17,7 @@ Adds RSSI sensor and number components to tweak frequency and bandwidth on the f
 I use this to tweak the values to maximize reception.
 
 
+# Links:
+
+* Discord thread: https://discord.com/channels/429907082951524364/838121145113772033/959545959484911666
+* Github support request issue: https://github.com/esphome/feature-requests/issues/59
