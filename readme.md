@@ -10,6 +10,9 @@
 # Basic Usage
 see cc1101.yaml
 
+# Raw signal visualizer
+https://github.com/dbuezas/esphome-remote_receiver-oscilloscope
+
 # Advanced
 See cc1101-advanced.yaml
 
