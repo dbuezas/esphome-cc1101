@@ -1,13 +1,18 @@
 # https://github.com/dbuezas/esphome-cc1101
 esphome:
-  name: cc1101
-  platform: ESP8266
-  board: d1_mini
+  name: cc1101-example
+  friendly_name: CC1101 example
   includes:
     - cc1101.h
   libraries:
     - SPI
     - "SmartRC-CC1101-Driver-Lib"
+
+esp8266:
+  board: d1_mini
+
+#esp32:
+#  board: esp32dev
 
 wifi:
   ssid: !secret wifi_name
@@ -16,32 +21,54 @@ wifi:
   power_save_mode: HIGH
 
 logger:
+  level: VERBOSE
 api:
 ota:
+
+web_server:
+  port: 80
 
 sensor:
   - platform: custom
     lambda: |-
       auto my_sensor = new CC1101(
+
+        // esp8266 example
         D5, // SCK
         D6, // MISO
         D7, // MOSI
         D3, // CSN
         D1, // GDO0
+
+        // esp32 example
+        // 18, // SCK
+        // 19, // MISO
+        // 23, // MOSI
+        // 5, // CSN
+        // 32, // GDO0
+
         200, // bandwidth_in_khz
-        433.92 // freq_in_mhz
+        433.92, // freq_in_mhz
+        id(transmitter) // id of remote_transmitter
       );
       App.register_component(my_sensor);
       return {my_sensor};
     sensors:
       id: transciver
       internal: true
+
 remote_transmitter:
-  - pin: D1 # This is GDO0
+  - id: transmitter
+    pin:
+      number: D1 # This is GDO0
+      allow_other_uses: true
     carrier_duty_percent: 100%
 
 remote_receiver:
-  - pin: D1 # This is GDO0
+  - id: receiver
+    pin:
+      number: D1 # This is GDO0
+      allow_other_uses: true
       # on the esp8266 use any of D1,D2,D5,D6,D7,Rx
       # Don't use D3,D4,D8,TX, boot often fails.
       # Can't be D0 or GPIO17 b/c no interrupts
@@ -51,12 +78,18 @@ binary_sensor:
   - platform: remote_receiver
     name: Garage
     raw:
-      code: [415,-300,370,-300,375,-300,378,-300,378,-300,379,-300,405]
+      # prettier-ignore
+      code: [990,-330,330,-990,990,-330,330,-990,330,-990,330,-990,330,-990,330,-990,330,-990,990,-330,330,-990,990,-330,330,-990,330,-990,330,-990,330,-990,330,-990,330,-990,990,-330,990,-330,330,-990,330,-990,990,-330,330,-990,330]
+
 button:
   - platform: template
     name: Garage
     on_press:
       - lambda: get_cc1101(transciver).beginTransmission();
       - remote_transmitter.transmit_raw:
-          code: [415,-300,370,-300,375,-300,378,-300,378,-300,379,-300,405]
+          # prettier-ignore
+          code: [990,-330,330,-990,990,-330,330,-990,330,-990,330,-990,330,-990,330,-990,330,-990,990,-330,330,-990,990,-330,330,-990,330,-990,330,-990,330,-990,330,-990,330,-990,990,-330,990,-330,330,-990,330,-990,990,-330,330,-990,330]
+          repeat:
+            times: 3
+            wait_time: 4.733ms
       - lambda: get_cc1101(transciver).endTransmission();
