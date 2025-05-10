@@ -35,7 +35,7 @@ sensor:
 
         // esp8266 example
         D5, // SCK
-        D6, // MISO
+        D6, // MISO (sometimes labeled as GDO1)
         D7, // MOSI
         D3, // CSN
         D1, // GDO0
